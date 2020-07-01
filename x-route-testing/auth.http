@@ -1,0 +1,22 @@
+### ROOT auth
+GET http://localhost:4000/user/all
+
+### add user
+POST  http://localhost:4000/user/register
+Content-Type: application/json 
+
+{
+    "email": "email",
+    "username" : "new_user",
+    "password": "password"
+}
+
+### login user
+POST  http://localhost:4000/user/login
+Content-Type: application/json 
+
+{
+    "username" : "email",
+    "password": "password"
+
+}
