@@ -6,9 +6,9 @@ POST  http://localhost:4000/user/register
 Content-Type: application/json 
 
 {
-    "email": "email",
+    "email": "test@test",
     "username" : "new_user",
-    "password": "password"
+    "password": "password1"
 }
 
 ### login user
