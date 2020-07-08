@@ -6,6 +6,7 @@ exports.up = function (knex) {
 			tbl.string("email").notNullable().unique();
 			tbl.string("password", 255).notNullable();
 			tbl.string("inGameName", 255);
+			tbl.string("uuid", 255).notNullable().unique();
 		})
 		.createTable("troops", (tbl) => {
 			tbl.increments("troopId").primary();
@@ -18,11 +19,13 @@ exports.up = function (knex) {
 			tbl.integer("t5cav").defaultTo(0);
 			tbl.integer("t5inf").defaultTo(0);
 			tbl.integer("t5arch").defaultTo(0);
+			tbl.string("uuid").notNullable().unique();
 		})
 		.createTable("building", (tbl) => {
 			tbl.increments("buildingId");
 			tbl.integer("city");
 			tbl.integer("castle");
+			tbl.string("uuid").notNullable().unique();
 		})
 		.createTable("userTroopsBuilding", (tbl) => {
 			tbl.increments("userTroopBuildingId").primary();
@@ -44,6 +47,7 @@ exports.up = function (knex) {
 				.inTable("building")
 				.onDelete("CASCADE")
 				.onUpdate("CASCADE");
+			tbl.string("uuid").notNullable().unique();
 		});
 };
 

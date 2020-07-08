@@ -1,10 +1,13 @@
 const router = require("express").Router();
 const Player = require("./player-model");
 
-// route gets player info
-router.get("/profile", async (req, res) => {
-	console.error("herer");
+const {
+	verifyUser,
+	authenticateUser,
+} = require("../../middleware/verify-user");
 
+// route gets player info
+router.get("/", [authenticateUser, verifyUser], async (req, res) => {
 	try {
 		const profile = await Player.find();
 		console.log("profile", profile);
@@ -14,6 +17,21 @@ router.get("/profile", async (req, res) => {
 		console.log("e", e);
 		res.status(404).json({
 			message: `An error has occured ${e}`,
+			error: e,
+		});
+	}
+});
+router.post("/troop", async (req, res) => {
+	const units = req.body.units;
+	const { userId } = req.user;
+	try {
+		const newTroops = await Player.addTroops(userId, units);
+
+		console.log("newTroops", newTroops);
+	} catch (e) {
+		console.log("e", e);
+		res.json(404).json({
+			message: `an error has occured ${e}`,
 			error: e,
 		});
 	}
