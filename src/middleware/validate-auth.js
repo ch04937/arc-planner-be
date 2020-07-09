@@ -17,7 +17,7 @@ const validateLogin = (req, res, next) => {
 		res.status(400).json({ message: "auth/missing form information" });
 	}
 
-	if (!req.body.username || !req.body.password) {
+	if (!req.body.userId || !req.body.password) {
 		res.status(400).json({
 			message: "auth/missing one or more request combination.",
 		});

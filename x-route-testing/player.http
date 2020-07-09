@@ -1,6 +1,6 @@
 ### root route
 GET http://localhost:4000/player/ 
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1OTQxNTUwODIsImV4cCI6MTU5NDI0MTQ4Mn0.xmzWA4w4xsOlmiMfODsB40CZrshHD6KZnI8fsVNcBY4
+
 
 ### root route
 POST http://localhost:4000/player/troop

@@ -15,69 +15,68 @@ const {
 router.post("/register", validateRegistration, async (req, res) => {
 	// implement registration
 	let { username, password, email } = req.body;
-	const hash = bcrypt.hashSync(password, 10);
+	const hashedPassword = bcrypt.hashSync(password, 10);
+
 	const newUser = {
 		username,
 		password,
 		email,
-		password: hash,
+		password: hashedPassword,
 		uuid: v1(),
 	};
 
 	try {
-		const users = await Users.addNewUser(newUser);
+		const user = await Users.addNewUser(newUser);
 		const token = generateToken({
-			profile: {
-				username: users.username,
-				uuid: uuid,
-			},
+			username: user.username,
+			uuid: user.uuid,
 		});
-
+		// add default info
 		res.status(201).json({
 			profile: {
-				firstName: users.firstName,
-				lastName: users.lastName,
-				email: users.email,
+				username: user.username,
+				email: user.email,
 			},
 			accessToken: token,
 		});
 	} catch (e) {
+		console.log("e", e);
 		res.status(500).json({ message: "unable to add user", e: e });
 	}
 });
 
 //post login
-router.post("/login", [validateLogin], (req, res) => {
+router.post("/login", validateLogin, async (req, res) => {
 	// implement login
 	let { userId, password } = req.body;
-
-	Users.find(userId)
-		.then((user) => {
-			if (user && bcrypt.compareSync(password, user.password)) {
-				const token = generateToken({
-					username: user.username,
-					uuid: user.uuid,
-				});
-				res.status(200).json({
-					profile: {
-						username: user.username,
-						email: user.email,
-					},
-					accessToken: token,
-				});
-			} else {
-				res.status(401).json({ message: "invalid credentials" });
-			}
-		})
-		.catch((err) => {
-			console.log(err);
-			res.status(500).json({ message: `server 500 error ${err}` });
-		});
+	try {
+		const createUser = await Users.find(userId);
+		if (createUser && bcrypt.compareSync(password, createUser.password)) {
+			const token = generateToken({
+				username: createUser.username,
+				uuid: createUser.uuid,
+			});
+			res.status(201).json({
+				profile: {
+					uuid: createUser.uuid,
+					username: createUser.username,
+					email: createUser.email,
+				},
+				accessToken: token,
+			});
+		} else {
+			res.status(401).json({ message: "invalid credentials" });
+		}
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({ message: `an error occured ${err}` });
+	}
 });
 //generate token @login
 function generateToken(user) {
 	const payload = {
 		username: user.username,
+		uuid: user.uuid,
 	};
 	const options = {
 		expiresIn: "1d",

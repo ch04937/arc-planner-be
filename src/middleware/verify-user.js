@@ -4,6 +4,7 @@ const Users = require("../routes/auth/auth-model");
 
 const authenticateUser = (req, res, next) => {
 	const token = req.headers.authorization;
+
 	if (token) {
 		jwt.verify(token, secrets.jwtSecrets, (err, decodedToken) => {
 			if (err) {
@@ -22,9 +23,7 @@ const authenticateUser = (req, res, next) => {
 
 const verifyUser = async (req, res, next) => {
 	const user = req.user;
-	console.log("user", user);
-
-	const registered = await Users.getByUuid(user.uuid);
+	const registered = await Users.getByUsername(user.username);
 
 	if (!registered) {
 		res.status(401).json({ message: "The user is not registered." });

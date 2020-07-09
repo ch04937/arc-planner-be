@@ -8,8 +8,9 @@ const {
 
 // route gets player info
 router.get("/", [authenticateUser, verifyUser], async (req, res) => {
+	const { username, uuid } = req.user;
 	try {
-		const profile = await Player.find();
+		const profile = await Player.getProfile(uuid);
 		console.log("profile", profile);
 
 		res.status(200).json({ profile: profile });

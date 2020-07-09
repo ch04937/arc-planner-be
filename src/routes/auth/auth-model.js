@@ -3,32 +3,29 @@ const db = require("../../data/db-config");
 module.exports = {
 	addNewUser,
 	getByUserId,
-	getByUuid,
+	getByUsername,
 	find,
 };
 
-function getByUserId(userId) {
-	return db("users").where({ userId }).first();
-}
-function getByUuid(uuid) {
-	return db("users").where({ uuid }).first();
-}
-
 function addNewUser(user) {
 	return db("users")
-		.insert(user, "userId")
+		.insert(user, "uuid")
 		.then((userIds) => {
 			return getByUserId(userIds[0]);
 		});
 }
-function find(username) {
+function getByUserId(userId) {
+	return db("users").where({ userId }).first();
+}
+
+function getByUsername(username) {
+	return db("users").where({ username }).first();
+}
+
+function find(userId) {
 	return db("users")
 		.where(function () {
-			this.where("username", "=", username).orWhere(
-				"email",
-				"=",
-				username
-			);
+			this.where("username", "=", userId).orWhere("email", "=", userId);
 		})
 		.first();
 }

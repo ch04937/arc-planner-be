@@ -1,11 +1,11 @@
 const db = require("../../data/db-config");
 
-module.exports = { find, addTroops };
+module.exports = { find, getProfile };
 
 function find() {
 	return db("troops");
 }
-function addTroops(userId, units) {
-	console.log("units", units);
-	return db("troops");
+
+function getProfile(uuid) {
+	return db("users").where({ uuid }).first();
 }
