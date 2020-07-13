@@ -10,8 +10,8 @@ module.exports = {
 function addNewUser(user) {
 	return db("users")
 		.insert(user, "uuid")
-		.then((userIds) => {
-			return getByUserId(userIds[0]);
+		.then((userId) => {
+			return getByUserId(userId[0]);
 		});
 }
 function getByUserId(userId) {

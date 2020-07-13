@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { v1 } = require("uuid");
 
-const Users = require("./auth-model.js");
+const Users = require("../model/auth-model.js");
 const secrets = require("../../configs/secrets.js");
 
 const {

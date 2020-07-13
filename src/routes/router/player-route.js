@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const Player = require("./player-model");
+const Player = require("../model/player-model");
 
 const {
 	verifyUser,
@@ -8,7 +8,7 @@ const {
 
 // route gets player info
 router.get("/", [authenticateUser, verifyUser], async (req, res) => {
-	const { username, uuid } = req.user;
+	const { uuid } = req.user;
 	try {
 		const profile = await Player.getProfile(uuid);
 		console.log("profile", profile);
@@ -22,6 +22,7 @@ router.get("/", [authenticateUser, verifyUser], async (req, res) => {
 		});
 	}
 });
+
 router.post("/troop", async (req, res) => {
 	const units = req.body.units;
 	const { userId } = req.user;
