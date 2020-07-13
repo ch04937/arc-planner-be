@@ -22,21 +22,21 @@ exports.up = function (knex) {
 			tbl.integer("t5cav").defaultTo(0);
 			tbl.integer("t5inf").defaultTo(0);
 			tbl.integer("t5arch").defaultTo(0);
-			tbl.integer("city");
-			tbl.integer("castle");
+			tbl.integer("city").defaultTo(0);
+			tbl.integer("castle").defaultTo(0);
 		})
 		.createTable("userProfile", (tbl) => {
 			tbl.increments("userProfile").primary();
 			tbl.string("uuid", 255);
 			tbl.integer("userId")
 				.unsigned()
-				.references("uuid")
+				.references("userId")
 				.inTable("users")
 				.onDelete("CASCADE")
 				.onUpdate("CASCADE");
 			tbl.integer("profileId")
 				.unsigned()
-				.references("uuid")
+				.references("profileId")
 				.inTable("profile")
 				.onDelete("CASCADE")
 				.onUpdate("CASCADE");

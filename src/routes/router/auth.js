@@ -3,8 +3,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { v1 } = require("uuid");
 
-const Users = require("../model/auth-model.js");
 const secrets = require("../../configs/secrets.js");
+const Users = require("../model/auth-model.js");
+const Profile = require("../model/profile-model");
 
 const {
 	validateRegistration,
@@ -32,6 +33,8 @@ router.post("/register", validateRegistration, async (req, res) => {
 			uuid: user.uuid,
 		});
 		// add default info
+		await Profile.addDefaultProfile(user.userId);
+
 		res.status(201).json({
 			profile: {
 				username: user.username,

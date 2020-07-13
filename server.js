@@ -3,8 +3,8 @@ const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
 
-const auth = require("./src/routes/router/auth-route");
-const player = require("./src/routes/router/player-route");
+const auth = require("./src/routes/router/auth");
+const player = require("./src/routes/router/player");
 const profile = require("./src/routes/router/profile");
 
 const port = process.env.PORT || 4000;
