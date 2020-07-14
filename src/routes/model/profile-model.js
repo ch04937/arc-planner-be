@@ -5,10 +5,11 @@ module.exports = {
 	getProfile,
 	add,
 	addDefaultProfile,
+	update,
 };
 
-function getProfile(uuid) {
-	return db("profile").where({ uuid }).first();
+function getProfile(profileId) {
+	return db("profile").where({ profileId }).first();
 }
 
 function add(body) {
@@ -34,4 +35,11 @@ function addDefaultProfile(userId) {
 				})
 				.then((ids) => ids[0]);
 		});
+}
+
+function update(profileId, changes) {
+	return db("profile")
+		.where({ profileId })
+		.update(changes)
+		.then((count) => (count > 0 ? getProfile(profileId) : null));
 }
