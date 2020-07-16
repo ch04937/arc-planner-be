@@ -2,7 +2,7 @@ const db = require("../../data/db-config");
 
 module.exports = {
 	addNewUser,
-	getByUserId,
+	getByUserUuid,
 	getByUsername,
 	find,
 };
@@ -14,8 +14,8 @@ function addNewUser(user) {
 			return getByUserId(userId[0]);
 		});
 }
-function getByUserId(userId) {
-	return db("users").where({ userId }).first();
+function getByUserUuid(uuid) {
+	return db("users").where({ uuid }).first();
 }
 
 function getByUsername(username) {

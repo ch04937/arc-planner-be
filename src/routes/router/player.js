@@ -1,17 +1,20 @@
 const router = require("express").Router();
 const Player = require("../model/auth-model");
 
-const {
-	verifyUser,
-	authenticateUser,
-} = require("../../middleware/verify-user");
+const { verifyUser } = require("../../middleware/verify-user");
 
 // route gets player info
-router.get("/", [authenticateUser, verifyUser], async (req, res) => {
+router.get("/", verifyUser, async (req, res) => {
 	const { uuid } = req.user;
 	try {
-		const profile = await Player.getByUserId(uuid);
-		res.status(200).json({ profile: profile });
+		const profile = await Player.getByUserUuid(uuid);
+		const player = {
+			uuid: profile.uuid,
+			username: profile.username,
+			email: profile.email,
+			created_at: profile.created_at,
+		};
+		res.status(200).json(player);
 	} catch (e) {
 		res.status(404).json({
 			message: `An error has occured ${e}`,
