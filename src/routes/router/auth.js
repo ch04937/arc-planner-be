@@ -11,7 +11,6 @@ const {
 	validateRegistration,
 	validateLogin,
 } = require("../../middleware/validate-auth");
-const { response } = require("express");
 
 const tokenList = {};
 
@@ -103,14 +102,10 @@ router.post("/refresh", async (req, res) => {
 	const body = req.body;
 
 	if (body.refreshToken && body.refreshToken in tokenList) {
-		const user = await Users.find(body.userId);
-		const token = createToken({ username: user.userId });
+		const token = createToken({ username: body.userId });
 		const response = { refreshToken: token };
 
-		console.log("tokenList", tokenList);
 		tokenList[body.refreshToken].accessToken = token;
-		console.log("tokenList", tokenList);
-
 		res.status(200).json(response);
 	} else {
 		res.status(404).json({ message: "invalid request" });

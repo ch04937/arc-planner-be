@@ -5,10 +5,10 @@ const { verifyUser } = require("../../middleware/verify-user");
 
 // get profile info
 router.get("/", verifyUser, async (req, res) => {
-	const { uuid } = req.user;
+	const { userId } = req.user;
 	try {
-		const profile = Profile.getProfile(uuid);
-		res.status(202).json({ profile: profile });
+		const profile = await Profile.getProfile(userId);
+		res.status(202).json(profile);
 	} catch (e) {
 		console.log("e", e);
 		res.status(404).json({ message: `could not find ${e}`, e: e });

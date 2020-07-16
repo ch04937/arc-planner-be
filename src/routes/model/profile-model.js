@@ -5,11 +5,19 @@ module.exports = {
 	getProfile,
 	add,
 	addDefaultProfile,
+	// getProfileById,
 	update,
 };
 
-function getProfile(profileId) {
-	return db("profile").where({ profileId }).first();
+function getProfile(userId) {
+	return db("userProfile as up", "up.userId")
+		.join("users as u")
+		.where("u.userId", "=", userId)
+		.select("up.profileId")
+		.then((ids) => {
+			profileId = ids[0];
+			return db("profile").where(profileId).first();
+		});
 }
 
 function add(body) {
