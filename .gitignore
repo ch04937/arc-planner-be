@@ -1,3 +1,4 @@
 /node_modules
 .env
 /x-route-testing
+/public/uploads

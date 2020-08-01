@@ -5,7 +5,7 @@ module.exports = {
 	getProfile,
 	getImg,
 	add,
-	// saveImg,
+	saveImg,
 	addDefaultProfile,
 	addDefaultImage,
 	update,
@@ -38,9 +38,16 @@ function add(body) {
 		.then((res) => getByUserId(res[0]));
 }
 
-// function saveImg(userId) {
-// 	return db("userImage as ui").join("profilePicture as pp").update(data);
-// }
+function getUpdatedImg(imgId) {
+	return db("profilePicture").where({ imgId }).first();
+}
+
+function saveImg(imgId, changes) {
+	return db("profilePicture")
+		.where({ imgId })
+		.update(changes)
+		.then((count) => (count > 0 ? getUpdatedImg(imgId) : null));
+}
 
 function addDefaultImage(userId) {
 	const imgId = {

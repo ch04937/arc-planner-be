@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({
 	storage: storage,
-	limits: { fileSize: 1000000 },
+	limits: { fileSize: 10000000 },
 	fileFilter: function (req, file, cb) {
 		checkFileType(file, cb);
 	},
@@ -48,7 +48,7 @@ router.get("/", verifyUser, async (req, res) => {
 	}
 });
 
-router.get("/img", verifyUser, async (req, res) => {
+router.get("/profilePicture", verifyUser, async (req, res) => {
 	const { userId } = req.user;
 	try {
 		const profilePic = await Profile.getImg(userId);
@@ -82,7 +82,7 @@ router.put("/ncc", verifyUser, async (req, res) => {
 	}
 });
 
-router.put("/img", verifyUser, async (req, res) => {
+router.put("/img/:imgId", verifyUser, async (req, res) => {
 	upload(req, res, (err) => {
 		if (err) {
 			console.log("err", err);
@@ -98,20 +98,17 @@ router.put("/img", verifyUser, async (req, res) => {
 					path: req.file.path,
 					size: req.file.size,
 				};
-
-				try {
-					console.log(req.file);
-					// const saved = Profile.saveImg(req.user.userId, data);
-					// console.log("saved", saved);
-					// res.status(201).json(saved);
-				} catch (e) {
-					res.status(500).json({
-						message: "An Error Occured with saving the image",
-						error: e,
+				Profile.saveImg(req.params.imgId, data)
+					.then((response) => {
+						res.status(201).json(response);
+					})
+					.catch((e) => {
+						console.log("e", e);
+						res.status(500).json({
+							message: "An Error Occured with saving the image",
+							error: e,
+						});
 					});
-				}
-
-				res.send("test");
 			}
 		}
 	});
