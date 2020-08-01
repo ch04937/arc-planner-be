@@ -38,6 +38,7 @@ router.post("/register", validateRegistration, async (req, res) => {
 		});
 		// add default info
 		await Profile.addDefaultProfile(user.userId);
+		await Profile.addDefaultImage(user.userId);
 
 		const response = {
 			accessToken: token,
@@ -56,6 +57,7 @@ router.post("/register", validateRegistration, async (req, res) => {
 			refreshToken: refreshToken,
 		});
 	} catch (e) {
+		console.log("e", e);
 		res.status(500).json({ message: "unable to add user", e: e });
 	}
 });

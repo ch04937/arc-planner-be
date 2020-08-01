@@ -10,6 +10,9 @@ const profile = require("./src/routes/router/profile");
 const port = process.env.PORT || 4000;
 
 const server = express();
+
+server.use(express.static("./public"));
+
 server.use(helmet());
 server.use(cors());
 server.use(express.json());
@@ -17,7 +20,8 @@ server.use(express.json());
 server.use("/user", auth);
 server.use("/player", player);
 server.use("/profile", profile);
+server.use("/static", express.static("./public"));
 
-server.get("/", (req, res) => res.send("express bd for ark planner"));
+server.get("/", (req, res) => res.send("index"));
 
 server.listen(port, () => console.log(`\n*** Listening on port ${port}***\n`));
