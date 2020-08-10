@@ -5,9 +5,9 @@ const { verifyUser } = require("../../middleware/verify-user");
 
 // route gets player info
 router.get("/", verifyUser, async (req, res) => {
-	const { uuid } = req.user;
+	const { userId } = req.user;
 	try {
-		const profile = await Player.getByUserUuid(uuid);
+		const profile = await Player.getByUserId(userId);
 		const player = {
 			uuid: profile.uuid,
 			username: profile.username,

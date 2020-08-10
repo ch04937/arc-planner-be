@@ -5,7 +5,12 @@ module.exports = {
 	getByUserId,
 	getByUsername,
 	find,
+	findGuild,
 };
+
+function findGuild(userId) {
+	return db("users").where({ userId }).first().select("isMember");
+}
 
 function addNewUser(user) {
 	return db("users")

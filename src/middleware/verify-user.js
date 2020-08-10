@@ -8,19 +8,19 @@ const verifyUser = async (req, res, next) => {
 	if (token) {
 		jwt.verify(token, secrets.jwtRefreshSecrets, (err, decodedToken) => {
 			if (err) {
-				res.status(401).json({ message: "you shall not pass!" });
+				res.status(401).json({ message: "You need to login" });
 			}
 			req.user = { username: decodedToken.username };
 		});
 		const registered = await Users.getByUsername(req.user.username);
 		if (!registered) {
-			res.status(401).json({ message: "The user is not registered." });
+			res.status(401).json({ message: "You need to create an account" });
 		}
 		req.user = registered;
 		next();
 	} else {
 		res.status(403).json({
-			message: "You Need to be logged In",
+			message: "You need to be logged in",
 		});
 	}
 };

@@ -6,6 +6,7 @@ const cors = require("cors");
 const auth = require("./src/routes/router/auth");
 const player = require("./src/routes/router/player");
 const profile = require("./src/routes/router/profile");
+const alliance = require("./src/routes/router/alliance");
 
 const port = process.env.PORT || 4000;
 
@@ -20,7 +21,8 @@ server.use(express.json());
 server.use("/user", auth);
 server.use("/player", player);
 server.use("/profile", profile);
-server.use("/static", express.static("./public"));
+server.use("/alliance", alliance);
+server.use("/public", express.static("./public"));
 
 server.get("/", (req, res) => res.send("index"));
 

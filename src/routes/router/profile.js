@@ -44,6 +44,7 @@ router.get("/", verifyUser, async (req, res) => {
 		const profile = await Profile.getProfile(userId);
 		res.status(202).json(profile);
 	} catch (e) {
+		console.log("e", e);
 		res.status(404).json({ message: `could not find ${e}`, e: e });
 	}
 });

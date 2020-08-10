@@ -67,13 +67,13 @@ router.post("/login", validateLogin, async (req, res) => {
 	// implement login
 	let { userId, password } = req.body;
 	try {
-		const createUser = await Users.find(userId);
-		if (createUser && bcrypt.compareSync(password, createUser.password)) {
+		const findUser = await Users.find(userId);
+		if (findUser && bcrypt.compareSync(password, findUser.password)) {
 			const token = createToken({
-				username: createUser.username,
+				username: findUser.username,
 			});
 			const refreshToken = createRefreshToken({
-				username: createUser.username,
+				username: findUser.username,
 			});
 
 			const response = {
@@ -85,15 +85,15 @@ router.post("/login", validateLogin, async (req, res) => {
 
 			res.status(201).json({
 				profile: {
-					uuid: createUser.uuid,
-					username: createUser.username,
-					email: createUser.email,
+					uuid: findUser.uuid,
+					username: findUser.username,
+					email: findUser.email,
 				},
 				accessToken: token,
 				refreshToken: refreshToken,
 			});
 		} else {
-			res.status(401).json({ message: "invalid credentials" });
+			res.status(401).json({ message: "Invalid username or password" });
 		}
 	} catch (err) {
 		res.status(500).json({ message: `an error occured ${err}` });
