@@ -82,14 +82,14 @@ exports.up = function (knex) {
     .createTable("userAlliance", (tbl) => {
       tbl.increments().primary();
       tbl
-        .string("userId", 255)
+        .integer("userId", 255)
         .unsigned()
         .references("userId")
         .inTable("users")
         .onDelete("CASCADE")
         .onUpdate("CASCADE");
       tbl
-        .string("allianceId", 255)
+        .integer("allianceId", 255)
         .unsigned()
         .references("allianceId")
         .inTable("alliance")
@@ -98,6 +98,7 @@ exports.up = function (knex) {
       tbl.boolean("isOwner").defaultTo(false);
       tbl.boolean("isR4").defaultTo(false);
       tbl.boolean("isParticipating").defaultTo(false);
+      tbl.boolean("hasApplied").defaultTo(false);
     });
 };
 
