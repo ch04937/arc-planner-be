@@ -94,7 +94,8 @@ exports.up = function (knex) {
         .references("allianceId")
         .inTable("alliance")
         .onDelete("CASCADE")
-        .onUpdate("CASCADE");
+        .onUpdate("CASCADE")
+        .defaultTo(0);
       tbl.boolean("isOwner").defaultTo(false);
       tbl.boolean("isR4").defaultTo(false);
       tbl.boolean("isParticipating").defaultTo(false);

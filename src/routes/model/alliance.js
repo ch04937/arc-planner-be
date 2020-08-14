@@ -7,8 +7,18 @@ module.exports = {
   createAlliance,
   postApplication,
   getAllianceIdByUuid,
+  cancelApplication,
 };
 
+async function cancelApplication(uuid, userId) {
+  const id = await getAllianceIdByUuid(uuid);
+  const post = { ...id, userId: userId };
+  return db("userAlliance")
+    .where(post)
+    .first()
+    .del()
+    .then(() => getApplications(userId));
+}
 function getAllianceIdByUuid(uuid) {
   return db("alliance").where({ uuid }).select("allianceId").first();
 }
@@ -21,12 +31,7 @@ async function postApplication(uuid, userId) {
   const post = { ...id, userId: userId, hasApplied: true };
   return db("userAlliance")
     .insert(post)
-    .then((ids) => {
-      const allianceId = post.allianceId;
-      // get the alliance uuid
-      console.log("allianceId", allianceId);
-      return db("alliance").where({ allianceId }).select("uuid");
-    });
+    .then(() => getApplications(userId));
 }
 
 function getApplications(userId) {

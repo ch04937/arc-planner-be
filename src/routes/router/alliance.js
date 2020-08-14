@@ -32,7 +32,7 @@ router.get("/applications", verifyUser, async (req, res) => {
   }
 });
 
-router.post("/applications/:allianceId", verifyUser, async (req, res) => {
+router.post("/applications/apply/:allianceId", verifyUser, async (req, res) => {
   const uuid = req.params.allianceId;
   try {
     const data = await Alliance.postApplication(uuid, req.user.userId);
@@ -42,6 +42,20 @@ router.post("/applications/:allianceId", verifyUser, async (req, res) => {
     res.status(404).json({ message: "could not find alliance" });
   }
 });
+router.delete(
+  "/applications/cancel/:allianceId",
+  verifyUser,
+  async (req, res) => {
+    const uuid = req.params.allianceId;
+    try {
+      const data = await Alliance.cancelApplication(uuid, req.user.userId);
+      res.status(200).json(data);
+    } catch (e) {
+      console.log("e", e);
+      res.status(404).json({ message: "could not find alliance" });
+    }
+  }
+);
 
 router.post("/", verifyUser, async (req, res) => {
   const body = req.body;
