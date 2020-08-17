@@ -4,6 +4,7 @@ const { v1 } = require("uuid");
 
 const Users = require("../model/auth-model.js");
 const Profile = require("../model/profile-model");
+const Alliance = require("../model/alliance.js");
 
 const { createToken, createRefreshToken } = require("../../utils/tokens");
 

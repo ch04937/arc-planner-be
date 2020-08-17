@@ -8,8 +8,6 @@ exports.up = function (knex) {
       tbl.string("password", 255).notNullable();
       tbl.timestamp("created_at").defaultTo(knex.fn.now());
       tbl.boolean("isMember").defaultTo(false);
-      tbl.boolean("isLead").defaultTo(false);
-      tbl.boolean("isOwner").defaultTo(false);
     })
     .createTable("profile", (tbl) => {
       tbl.increments("profileId").primary();
@@ -78,9 +76,10 @@ exports.up = function (knex) {
       tbl.integer("allianceOwner").notNullable();
       tbl.string("allianceTag", 255).notNullable();
       tbl.string("allianceName", 255).notNullable();
+      tbl.text("messageBoard");
     })
     .createTable("userAlliance", (tbl) => {
-      tbl.increments().primary();
+      tbl.increments("userAllianceId").primary();
       tbl
         .integer("userId", 255)
         .unsigned()
@@ -97,7 +96,8 @@ exports.up = function (knex) {
         .onUpdate("CASCADE")
         .defaultTo(0);
       tbl.boolean("isOwner").defaultTo(false);
-      tbl.boolean("isR4").defaultTo(false);
+      tbl.boolean("isLead").defaultTo(false);
+      tbl.boolean("isMember").defaultTo(false);
       tbl.boolean("isParticipating").defaultTo(false);
       tbl.boolean("hasApplied").defaultTo(false);
     });

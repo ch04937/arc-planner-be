@@ -1,8 +1,10 @@
 const db = require("../../data/db-config");
 
 module.exports = {
+  getUserAlliance,
+  getMemberCount,
   getAlliance,
-  getAllAlliance,
+  getAllianceList,
   getApplications,
   createAlliance,
   postApplication,
@@ -48,18 +50,17 @@ function getApplications(userId) {
     });
 }
 
-function getAlliance(userId) {
-  return db("userAlliance as ua", "ua.userId")
-    .join("users as u")
-    .where("u.userId", "=", userId)
-    .select("ua.allianceId")
-    .then((ids) => {
-      allianceId = ids[0];
-      return db("alliance").where(allianceId).first();
-    });
+function getMemberCount(allianceId) {
+  return db("userAlliance").where({ allianceId, isMember: true });
 }
 
-function getAllAlliance() {
+function getUserAlliance(userId) {
+  return db("userAlliance").where({ userId, isMember: true }).first();
+}
+function getAlliance(allianceId) {
+  return db("alliance").where({ allianceId }).first();
+}
+function getAllianceList() {
   return db("alliance");
 }
 
@@ -70,11 +71,13 @@ function createAlliance(post) {
     .then((id) => {
       const allianceId = id[0];
       return db("userAlliance")
-        .insert({ userId, allianceId, isOwner: true })
-        .then((ids) => getByUserAllianceId(ids[0]));
+        .insert({
+          userId,
+          allianceId,
+          isOwner: true,
+          isMember: true,
+          isLead: true,
+        })
+        .then(() => getAllAlliance());
     });
-}
-
-function getByUserAllianceId(id) {
-  return db("userAlliance").where({ id }).first();
 }
