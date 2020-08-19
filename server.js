@@ -7,6 +7,7 @@ const auth = require("./src/routes/router/auth");
 const player = require("./src/routes/router/player");
 const profile = require("./src/routes/router/profile");
 const alliance = require("./src/routes/router/alliance");
+const events = require("./src/routes/router/events");
 
 const port = process.env.PORT || 4000;
 
@@ -22,6 +23,7 @@ server.use("/user", auth);
 server.use("/player", player);
 server.use("/profile", profile);
 server.use("/alliance", alliance);
+server.use("/events", events);
 server.use("/public", express.static("./public"));
 
 server.get("/", (req, res) => res.send("index"));

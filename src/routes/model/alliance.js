@@ -10,7 +10,18 @@ module.exports = {
   postApplication,
   getAllianceIdByUuid,
   cancelApplication,
+  getGovName,
 };
+
+function getGovName(userId) {
+  return db("userProfile")
+    .where({ userId })
+    .select("profileId")
+    .first()
+    .then((profileId) => {
+      return db("profile").where(profileId).select("inGameName").first();
+    });
+}
 
 async function cancelApplication(uuid, userId) {
   const id = await getAllianceIdByUuid(uuid);
@@ -78,6 +89,6 @@ function createAlliance(post) {
           isMember: true,
           isLead: true,
         })
-        .then(() => getAllAlliance());
+        .then(() => getAlliance(allianceId));
     });
 }

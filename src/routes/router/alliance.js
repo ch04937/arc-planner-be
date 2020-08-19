@@ -7,15 +7,28 @@ const User = require("../model/auth-model");
 const { verifyUser } = require("../../middleware/verify-user");
 
 // find alliances
-router.get("/", verifyUser, async (req, res) => {
+router.get("/list", verifyUser, async (req, res) => {
   try {
-    const data = await Alliance.getUserAlliance(req.user.userId);
+    const list = await Alliance.getAllianceList();
+    console.log("list", list);
+    res.status(200).json(list);
+  } catch (e) {
+    res.status(404).json({ message: "Could not find any alliances", error: e });
+  }
+});
+// find alliances
+router.get("/", verifyUser, async (req, res) => {
+  const { userId } = req.user;
+  try {
+    const gov_name = await Alliance.getGovName(userId);
+    const data = await Alliance.getUserAlliance(userId);
     const alliance = await Alliance.getAlliance(data.allianceId);
     const count = await Alliance.getMemberCount(data.allianceId);
-    const response = { ...data, ...alliance, count: count.length };
+    const response = { ...data, ...alliance, ...gov_name, count: count.length };
 
     res.status(200).json(response);
   } catch (e) {
+    console.log("e", e);
     res.status(404).json({ message: "could not find alliance", error: e });
   }
 });
@@ -65,20 +78,10 @@ router.post("/", verifyUser, async (req, res) => {
     allianceOwner: userId,
   };
   try {
-    const alliance = await Alliance.createAlliance(post);
+    Alliance.createAlliance(post);
     const profile = await User.updateUserMember(userId);
-    const response = {
-      alliance: alliance,
-      userProfile: {
-        uuid: profile.uuid,
-        username: profile.username,
-        email: profile.email,
-        created_at: profile.created_at,
-        isMember: profile.isMember,
-      },
-    };
-    console.log("response", response);
-    res.status(200).json(response);
+
+    res.status(200).json(profile);
   } catch (e) {
     console.log("e", e);
     res.status(404).json({ message: "Could not create alliance" });
