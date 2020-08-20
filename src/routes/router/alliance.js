@@ -24,14 +24,11 @@ router.get("/list", verifyUser, async (req, res) => {
   }
 });
 // find alliances
-router.get("/", verifyUser, async (req, res) => {
-  const { userId } = req.user;
+router.get("/", [verifyUser, verifyAlliance], async (req, res) => {
   try {
-    const gov_name = await Alliance.getGovName(userId);
-    const data = await Alliance.getUserAlliance(userId);
-    const alliance = await Alliance.getAlliance(data.allianceId);
-    const count = await Alliance.getMemberCount(data.allianceId);
-    const response = { ...data, ...alliance, ...gov_name, count: count.length };
+    const alliance = await Alliance.getAlliance(req.alliance.allianceId);
+    const count = await Alliance.getMemberCount(req.alliance.allianceId);
+    const response = { ...alliance, count: count.length };
     res.status(200).json(response);
   } catch (e) {
     console.log("e", e);
@@ -42,11 +39,8 @@ router.get("/", verifyUser, async (req, res) => {
 router.get("/members", [verifyUser, verifyAlliance], async (req, res) => {
   try {
     const members = await Alliance.getMembers(req.alliance.allianceId);
-    if (members.length) {
-      res.status(200).json(members);
-    } else {
-      res.status(404).json({ message: "the alliance is empty" });
-    }
+    console.log("members", members);
+    res.status(200).json(members);
   } catch (e) {
     console.log("e", e);
     res.status(500).json({ message: "An error has occured" });

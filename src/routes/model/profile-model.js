@@ -10,12 +10,11 @@ module.exports = {
 };
 
 function getProfile(userId) {
-  return db("userProfile as up", "up.userId")
-    .join("users as u")
-    .where("u.userId", "=", userId)
-    .select("up.profileId")
+  return db("userProfile")
+    .where({ userId })
+    .select("profileId")
     .then((ids) => {
-      profileId = ids[0];
+      const profileId = ids[0];
       return db("profile").where(profileId).first();
     });
 }

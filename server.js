@@ -4,7 +4,6 @@ const helmet = require("helmet");
 const cors = require("cors");
 
 const auth = require("./src/routes/router/auth");
-const player = require("./src/routes/router/player");
 const profile = require("./src/routes/router/profile");
 const alliance = require("./src/routes/router/alliance");
 const events = require("./src/routes/router/events");
@@ -20,7 +19,6 @@ server.use(cors());
 server.use(express.json());
 
 server.use("/user", auth);
-server.use("/player", player);
 server.use("/profile", profile);
 server.use("/alliance", alliance);
 server.use("/events", events);
