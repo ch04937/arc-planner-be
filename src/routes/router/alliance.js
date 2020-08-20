@@ -5,15 +5,22 @@ const Alliance = require("../model/alliance");
 const User = require("../model/auth-model");
 
 const { verifyUser } = require("../../middleware/verify-user");
+const { verifyAlliance } = require("../../middleware/verify-alliance");
 
 // find alliances
 router.get("/list", verifyUser, async (req, res) => {
   try {
     const list = await Alliance.getAllianceList();
-    console.log("list", list);
-    res.status(200).json(list);
+    if (list.length) {
+      res.status(200).json(list);
+    } else {
+      res.status(404).json({ message: "Could not find any alliances" });
+    }
   } catch (e) {
-    res.status(404).json({ message: "Could not find any alliances", error: e });
+    res.status(500).json({
+      message: "There is a server error, refresh the page or try again later",
+      error: e,
+    });
   }
 });
 // find alliances
@@ -25,11 +32,24 @@ router.get("/", verifyUser, async (req, res) => {
     const alliance = await Alliance.getAlliance(data.allianceId);
     const count = await Alliance.getMemberCount(data.allianceId);
     const response = { ...data, ...alliance, ...gov_name, count: count.length };
-
     res.status(200).json(response);
   } catch (e) {
     console.log("e", e);
     res.status(404).json({ message: "could not find alliance", error: e });
+  }
+});
+
+router.get("/members", [verifyUser, verifyAlliance], async (req, res) => {
+  try {
+    const members = await Alliance.getMembers(req.alliance.allianceId);
+    if (members.length) {
+      res.status(200).json(members);
+    } else {
+      res.status(404).json({ message: "the alliance is empty" });
+    }
+  } catch (e) {
+    console.log("e", e);
+    res.status(500).json({ message: "An error has occured" });
   }
 });
 

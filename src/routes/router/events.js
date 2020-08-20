@@ -11,14 +11,19 @@ router.get("/", verifyAlliance, async (req, res) => {
     console.log("e", e);
   }
 });
+
 router.get("/current", [verifyUser, verifyAlliance], async (req, res) => {
   try {
     const response = await Events.getCurrentEvent(
       req.alliance.userId,
       req.alliance.allianceId
     );
-    console.log("response", response);
-    res.status(200).json(response);
+    if (response.length) {
+      console.log("response.length", response.length);
+      res.status(200).json(response);
+    } else {
+      res.status(404).json({ message: "No current events going on" });
+    }
   } catch (e) {
     console.log("e", e);
   }

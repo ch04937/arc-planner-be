@@ -6,12 +6,37 @@ module.exports = {
   getAlliance,
   getAllianceList,
   getApplications,
+  getMembers,
   createAlliance,
   postApplication,
   getAllianceIdByUuid,
   cancelApplication,
   getGovName,
 };
+
+function getAllianceMembers(userId) {
+  return db("userProfile")
+    .where({ userId })
+    .select("profileId")
+    .then((ids) => {
+      const profileId = ids[0];
+      return db("profile").where(profileId);
+    });
+}
+
+function getMembers(allianceId) {
+  return db("userAlliance")
+    .where({ allianceId, isMember: true })
+    .select("userId")
+    .then(async (userId) => {
+      const members = [];
+      for (let i = 0; i < userId.length; i++) {
+        const member = await getAllianceMembers(userId[i].userId);
+        members.push(member);
+      }
+      return members[0];
+    });
+}
 
 function getGovName(userId) {
   return db("userProfile")

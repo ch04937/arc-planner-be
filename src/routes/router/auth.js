@@ -57,7 +57,6 @@ router.post("/register", validateRegistration, async (req, res) => {
     });
     // add default info
     await Profile.addDefaultProfile(user.userId);
-    await Profile.addDefaultImage(user.userId);
 
     const response = {
       accessToken: token,
