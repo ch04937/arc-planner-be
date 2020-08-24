@@ -12,7 +12,12 @@ module.exports = {
   getAllianceIdByUuid,
   cancelApplication,
   getGovName,
+  getPrivilege,
 };
+
+function getPrivilege(allianceId, userId) {
+  return db("userAlliance").where({ allianceId, userId });
+}
 
 function getAllianceMembers(userId) {
   return db("userProfile")

@@ -39,9 +39,7 @@ exports.down = function (knex, Promise) {
     .dropTableIfExists("userAlliance")
     .dropTableIfExists("events")
     .dropTableIfExists("alliance")
-    .dropTableIfExists("userImage")
     .dropTableIfExists("userProfile")
-    .dropTableIfExists("profilePicture")
     .dropTableIfExists("profile")
     .dropTableIfExists("users");
 };

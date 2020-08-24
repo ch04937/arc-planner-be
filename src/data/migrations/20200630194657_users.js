@@ -31,7 +31,6 @@ exports.up = function (knex, Promise) {
       tbl.string("mimetype", 255).defaultTo("image/png");
       tbl.string("path", 255).defaultTo("public\\unknowman.png");
     })
-
     .createTable("userProfile", (tbl) => {
       tbl.increments("userProfile");
       tbl

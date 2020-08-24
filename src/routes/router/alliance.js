@@ -25,9 +25,11 @@ router.get("/list", verifyUser, async (req, res) => {
 });
 // find alliances
 router.get("/", [verifyUser, verifyAlliance], async (req, res) => {
+  const { allianceId } = req.alliance;
   try {
-    const alliance = await Alliance.getAlliance(req.alliance.allianceId);
-    const count = await Alliance.getMemberCount(req.alliance.allianceId);
+    const alliance = await Alliance.getAlliance(allianceId);
+    const count = await Alliance.getMemberCount(allianceId);
+
     const response = { ...alliance, count: count.length };
     res.status(200).json(response);
   } catch (e) {
@@ -36,13 +38,22 @@ router.get("/", [verifyUser, verifyAlliance], async (req, res) => {
   }
 });
 
+router.get("/privilege", [verifyUser, verifyAlliance], async (req, res) => {
+  const { allianceId } = req.alliance;
+  const { userId } = req.user;
+  try {
+    const privilege = await Alliance.getPrivilege(allianceId, userId);
+    res.status(200).json(privilege[0]);
+  } catch (e) {
+    res.json(500).json({ message: "an error has ocurred" });
+  }
+});
+
 router.get("/members", [verifyUser, verifyAlliance], async (req, res) => {
   try {
     const members = await Alliance.getMembers(req.alliance.allianceId);
-    console.log("members", members);
     res.status(200).json(members);
   } catch (e) {
-    console.log("e", e);
     res.status(500).json({ message: "An error has occured" });
   }
 });
@@ -53,7 +64,6 @@ router.get("/applications", verifyUser, async (req, res) => {
     const data = await Alliance.getApplications(req.user.userId);
     res.status(200).json(data);
   } catch (e) {
-    console.log("e", e);
     res.status(404).json({ message: "could not find alliance" });
   }
 });
@@ -63,7 +73,6 @@ router.post("/applications/apply/:allianceId", verifyUser, async (req, res) => {
     const data = await Alliance.postApplication(uuid, req.user.userId);
     res.status(200).json(data);
   } catch (e) {
-    console.log("e", e);
     res.status(404).json({ message: "could not find alliance" });
   }
 });
@@ -76,7 +85,6 @@ router.delete(
       const data = await Alliance.cancelApplication(uuid, req.user.userId);
       res.status(200).json(data);
     } catch (e) {
-      console.log("e", e);
       res.status(404).json({ message: "could not find alliance" });
     }
   }
@@ -97,7 +105,6 @@ router.post("/", verifyUser, async (req, res) => {
 
     res.status(200).json(profile);
   } catch (e) {
-    console.log("e", e);
     res.status(404).json({ message: "Could not create alliance" });
   }
 });

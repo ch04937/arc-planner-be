@@ -3,8 +3,9 @@ exports.up = function (knex, Promise) {
     .createTable("events", (tbl) => {
       tbl.increments("eventsId");
       tbl.string("eventName", 255);
-      tbl.text("eventMessage");
-      tbl.timestamp("eventDate");
+      tbl.text("eventDescription");
+      tbl.timestamp("startDate");
+      tbl.timestamp("endDate");
       tbl.boolean("isExpired").defaultTo(false);
     })
     .createTable("userAllianceEvent", (tbl) => {

@@ -36,7 +36,8 @@ router.get("/", verifyUser, async (req, res) => {
 //post register
 router.post("/register", validateRegistration, async (req, res) => {
   // implement registration
-  let { username, password, email } = req.body;
+  let { username, password, email, inGameName } = req.body;
+
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   const newUser = {
@@ -56,7 +57,7 @@ router.post("/register", validateRegistration, async (req, res) => {
       username: user.username,
     });
     // add default info
-    await Profile.addDefaultProfile(user.userId);
+    await Profile.addDefaultProfile(user.userId, inGameName);
 
     const response = {
       accessToken: token,
@@ -75,7 +76,6 @@ router.post("/register", validateRegistration, async (req, res) => {
       refreshToken: refreshToken,
     });
   } catch (e) {
-    console.log("e", e);
     res.status(500).json({ message: "unable to add user", e: e });
   }
 });

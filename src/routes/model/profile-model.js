@@ -37,12 +37,13 @@ function saveImg(profileId, changes) {
     .then((count) => (count > 0 ? getUpdatedImg(profileId) : null));
 }
 
-function addDefaultProfile(userId) {
+function addDefaultProfile(userId, inGameName) {
   const profile = {
+    inGameName: inGameName,
     uuid: v1(),
   };
   return db("profile")
-    .insert(profile, "profileId")
+    .insert(profile)
     .then((ids) => {
       const profileId = ids[0];
       return db("userProfile")

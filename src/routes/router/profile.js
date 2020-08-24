@@ -42,9 +42,9 @@ router.get("/", verifyUser, async (req, res) => {
   const { userId } = req.user;
   try {
     const profile = await Profile.getProfile(userId);
+
     res.status(202).json(profile);
   } catch (e) {
-    console.log("e", e);
     res.status(404).json({ message: `could not find ${e}`, e: e });
   }
 });
@@ -76,7 +76,6 @@ router.put("/img/", verifyUser, async (req, res) => {
   const profileId = await Profile.getProfile(req.user.userId);
   upload(req, res, (err) => {
     if (err) {
-      console.log("err", err);
       res.status(400).send({ message: err });
     } else {
       if (req.file === undefined) {
@@ -94,7 +93,6 @@ router.put("/img/", verifyUser, async (req, res) => {
             res.status(201).json(response);
           })
           .catch((e) => {
-            console.log("e", e);
             res.status(500).json({
               message: "An Error Occured with saving the image",
               error: e,
