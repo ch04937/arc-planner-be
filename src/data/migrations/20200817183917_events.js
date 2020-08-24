@@ -1,7 +1,7 @@
 exports.up = function (knex, Promise) {
   return knex.schema
-    .createTable("events", (tbl) => {
-      tbl.increments("eventsId");
+    .createTable("event", (tbl) => {
+      tbl.increments("eventId");
       tbl.string("eventName", 255);
       tbl.text("eventDescription");
       tbl.timestamp("startDate");
@@ -25,13 +25,13 @@ exports.up = function (knex, Promise) {
         .onDelete("CASCADE")
         .onUpdate("CASCADE");
       tbl
-        .integer("eventsId", 255)
+        .integer("eventId", 255)
         .unsigned()
-        .references("eventsId")
-        .inTable("events")
+        .references("eventId")
+        .inTable("event")
         .onDelete("CASCADE")
         .onUpdate("CASCADE");
-      tbl.boolean("isParticipating").defaultTo(false);
+      tbl.boolean("isParticipating");
     });
 };
 

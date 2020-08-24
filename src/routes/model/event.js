@@ -12,26 +12,24 @@ function deleteEvent(eventId, allianceId) {
     .where({ eventId, allianceId })
     .del()
     .then(() => {
-      return db("events").where({ eventId }).del();
+      return db("event").where({ eventId }).del();
     });
 }
 
 function createEvent(userId, allianceId, body) {
-  return db("events")
+  return db("event")
     .insert(body)
     .then((ids) => {
       console.log("ids", ids);
-      const eventsId = ids[0];
+      const eventId = ids[0];
       return db("userAllianceEvent")
-        .insert({ userId, allianceId, eventsId })
+        .insert({ userId, allianceId, eventId })
         .then();
     });
 }
 
 function getCurrentEvent(userId, allianceId) {
-  return db("userAllianceEvent")
-    .where({ userId, allianceId })
-    .then((res) => {
-      return db("events").where({ isExpired: false });
-    });
+  return db("userAllianceEvent as uae")
+    .join("event as e", "e.eventId", "uae.eventId")
+    .where({ userId, allianceId, isExpired: false });
 }

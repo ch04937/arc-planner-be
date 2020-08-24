@@ -37,7 +37,7 @@ exports.down = function (knex, Promise) {
   return knex.schema
     .dropTableIfExists("userAllianceEvent")
     .dropTableIfExists("userAlliance")
-    .dropTableIfExists("events")
+    .dropTableIfExists("event")
     .dropTableIfExists("alliance")
     .dropTableIfExists("userProfile")
     .dropTableIfExists("profile")

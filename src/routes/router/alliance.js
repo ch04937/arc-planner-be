@@ -38,7 +38,7 @@ router.get("/", [verifyUser, verifyAlliance], async (req, res) => {
   }
 });
 
-router.get("/privilege", [verifyUser, verifyAlliance], async (req, res) => {
+router.get("/permissions", [verifyUser, verifyAlliance], async (req, res) => {
   const { allianceId } = req.alliance;
   const { userId } = req.user;
   try {
