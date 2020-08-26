@@ -7,7 +7,12 @@ module.exports = {
   find,
   findGuild,
   updateUserMember,
+  getProfile,
 };
+
+function getProfile(userId) {
+  return db("userProfile").where({ userId });
+}
 
 function findGuild(userId) {
   return db("users").where({ userId }).first().select("isMember");

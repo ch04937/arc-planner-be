@@ -42,17 +42,16 @@ router.get("/", verifyUser, async (req, res) => {
   const { userId } = req.user;
   try {
     const profile = await Profile.getProfile(userId);
-
-    res.status(202).json(profile);
+    res.status(202).json(profile[0]);
   } catch (e) {
-    res.status(404).json({ message: `could not find ${e}`, e: e });
+    res.status(404).json({ message: `could not find user's profile` });
   }
 });
 
 // change profile db
 router.put("/change", verifyUser, async (req, res) => {
   const changes = req.query;
-  const profileId = req.user.userId;
+  const profileId = req.profile.profileId;
   try {
     const post = await Profile.update(profileId, changes);
     res.status(202).json(post);
@@ -63,7 +62,7 @@ router.put("/change", verifyUser, async (req, res) => {
 
 router.put("/ncc", verifyUser, async (req, res) => {
   const changes = req.body;
-  const profileId = req.user.userId;
+  const profileId = req.profile.profileId;
   try {
     const post = await Profile.update(profileId, changes);
     res.status(202).json(post);
@@ -73,7 +72,7 @@ router.put("/ncc", verifyUser, async (req, res) => {
 });
 
 router.put("/img/", verifyUser, async (req, res) => {
-  const profileId = await Profile.getProfile(req.user.userId);
+  const profileId = await Profile.getProfile(req.profile.profileId);
   upload(req, res, (err) => {
     if (err) {
       res.status(400).send({ message: err });

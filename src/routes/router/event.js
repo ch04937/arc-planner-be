@@ -7,9 +7,11 @@ const Event = require("../model/event");
 const f5Error = "An error occurred loading reload page";
 
 router.get("/current", [verifyUser, verifyAlliance], async (req, res) => {
-  const { userId, allianceId } = req.alliance;
+  const { allianceId } = req.alliance;
+  const { profileId } = req.profile;
+
   try {
-    const response = await Event.getCurrentEvent(userId, allianceId);
+    const response = await Event.getCurrentEvent(profileId, allianceId);
     if (response.length) {
       res.status(200).json(response);
     } else {
@@ -50,7 +52,11 @@ router.get("/all", [verifyUser, verifyAlliance], async (req, res) => {
 
 router.post("/", [verifyUser, verifyAlliance], async (req, res) => {
   try {
-    await Event.createEvent(req.user.userId, req.alliance.allianceId, req.body);
+    await Event.createEvent(
+      req.profile.profileId,
+      req.alliance.allianceId,
+      req.body
+    );
 
     res.status(200).json({ message: "Event Created Succesfully" });
   } catch (e) {

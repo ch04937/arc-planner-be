@@ -1,27 +1,26 @@
 const db = require("../../data/db-config");
 
 module.exports = {
+  getAllianceList,
   getUserAlliance,
   getMemberCount,
   getAlliance,
-  getAllianceList,
   getApplications,
   getMembers,
   createAlliance,
   postApplication,
   getAllianceIdByUuid,
   cancelApplication,
-  getGovName,
   getPrivilege,
 };
 
-function getPrivilege(allianceId, userId) {
-  return db("userAlliance").where({ allianceId, userId });
+function getPrivilege(allianceId, profileId) {
+  return db("userAlliance").where({ allianceId, profileId });
 }
 
-function getAllianceMembers(userId) {
+function getAllianceMembers(profileId) {
   return db("userProfile")
-    .where({ userId })
+    .where({ profileId })
     .select("profileId")
     .then((ids) => {
       const profileId = ids[0];
@@ -32,35 +31,25 @@ function getAllianceMembers(userId) {
 function getMembers(allianceId) {
   return db("userAlliance")
     .where({ allianceId, isMember: true })
-    .select("userId")
-    .then(async (userId) => {
+    .select("profileId")
+    .then(async (profileId) => {
       const members = [];
-      for (let i = 0; i < userId.length; i++) {
-        const member = await getAllianceMembers(userId[i].userId);
+      for (let i = 0; i < profileId.length; i++) {
+        const member = await getAllianceMembers(profileId[i].profileId);
         members.push(member);
       }
       return members[0];
     });
 }
 
-function getGovName(userId) {
-  return db("userProfile")
-    .where({ userId })
-    .select("profileId")
-    .first()
-    .then((profileId) => {
-      return db("profile").where(profileId).select("inGameName").first();
-    });
-}
-
-async function cancelApplication(uuid, userId) {
+async function cancelApplication(uuid, profileId) {
   const id = await getAllianceIdByUuid(uuid);
-  const post = { ...id, userId: userId };
+  const post = { ...id, profileId: profileId };
   return db("userAlliance")
     .where(post)
     .first()
     .del()
-    .then(() => getApplications(userId));
+    .then(() => getApplications(profileId));
 }
 function getAllianceIdByUuid(uuid) {
   return db("alliance").where({ uuid }).select("allianceId").first();
@@ -69,17 +58,17 @@ function getAllianceUuidById(allianceId) {
   return db("alliance").where({ allianceId }).select("uuid").first();
 }
 
-async function postApplication(uuid, userId) {
+async function postApplication(uuid, profileId) {
   const id = await getAllianceIdByUuid(uuid);
-  const post = { ...id, userId: userId, hasApplied: true };
+  const post = { ...id, profileId: profileId, hasApplied: true };
   return db("userAlliance")
     .insert(post)
-    .then(() => getApplications(userId));
+    .then(() => getApplications(profileId));
 }
 
-function getApplications(userId) {
+function getApplications(profileId) {
   return db("userAlliance")
-    .where({ userId, hasApplied: true })
+    .where({ profileId, hasApplied: true })
     .select("allianceId")
     .then(async (ids) => {
       const uuids = [];
@@ -95,25 +84,22 @@ function getMemberCount(allianceId) {
   return db("userAlliance").where({ allianceId, isMember: true });
 }
 
-function getUserAlliance(userId) {
-  return db("userAlliance").where({ userId, isMember: true }).first();
+function getUserAlliance(profileId) {
+  return db("userAlliance").where({ profileId, isMember: true }).first();
 }
 function getAlliance(allianceId) {
   return db("alliance").where({ allianceId }).first();
 }
-function getAllianceList() {
-  return db("alliance");
-}
 
 function createAlliance(post) {
-  const userId = post.allianceOwner;
+  const profileId = post.allianceOwner;
   return db("alliance")
     .insert(post)
     .then((id) => {
       const allianceId = id[0];
       return db("userAlliance")
         .insert({
-          userId,
+          profileId,
           allianceId,
           isOwner: true,
           isMember: true,
@@ -121,4 +107,7 @@ function createAlliance(post) {
         })
         .then(() => getAlliance(allianceId));
     });
+}
+function getAllianceList() {
+  return db("alliance");
 }

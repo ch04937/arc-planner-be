@@ -11,7 +11,7 @@ module.exports = {
 
 function getEvent(eventId, allianceId) {
   return db("userAllianceEvent as uae")
-    .join("userProfile as up", "uae.userId", "up.userId")
+    .join("userProfile as up", "uae.profileId", "up.profileId")
     .join("profile as p", "up.profileId", "p.profileId")
     .where({ allianceId, eventId, isParticipating: true });
 }
@@ -22,9 +22,9 @@ function getAllEvent(allianceId) {
     .where({ allianceId });
 }
 
-function updateEvent(userId, allianceId, isParticipating, eventId) {
+function updateEvent(profileId, allianceId, isParticipating, eventId) {
   return db("userAllianceEvent")
-    .where({ allianceId, userId, eventId })
+    .where({ allianceId, profileId, eventId })
     .update({ isParticipating });
 }
 
@@ -37,20 +37,20 @@ function deleteEvent(eventId, allianceId) {
     });
 }
 
-function createEvent(userId, allianceId, body) {
+function createEvent(profileId, allianceId, body) {
   return db("event")
     .insert(body)
     .then((ids) => {
       console.log("ids", ids);
       const eventId = ids[0];
       return db("userAllianceEvent")
-        .insert({ userId, allianceId, eventId })
+        .insert({ profileId, allianceId, eventId })
         .then();
     });
 }
 
-function getCurrentEvent(userId, allianceId) {
+function getCurrentEvent(profileId, allianceId) {
   return db("userAllianceEvent as uae")
     .join("event as e", "e.eventId", "uae.eventId")
-    .where({ userId, allianceId, isExpired: false });
+    .where({ profileId, allianceId, isExpired: false });
 }

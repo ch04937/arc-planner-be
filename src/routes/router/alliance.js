@@ -7,6 +7,8 @@ const User = require("../model/auth-model");
 const { verifyUser } = require("../../middleware/verify-user");
 const { verifyAlliance } = require("../../middleware/verify-alliance");
 
+const f5Error = "An error occurred loading refresh page";
+
 // find alliances
 router.get("/list", verifyUser, async (req, res) => {
   try {
@@ -17,10 +19,7 @@ router.get("/list", verifyUser, async (req, res) => {
       res.status(404).json({ message: "Could not find any alliances" });
     }
   } catch (e) {
-    res.status(500).json({
-      message: "There is a server error, refresh the page or try again later",
-      error: e,
-    });
+    res.status(500).json({ message: f5Error });
   }
 });
 // find alliances
@@ -54,6 +53,7 @@ router.get("/members", [verifyUser, verifyAlliance], async (req, res) => {
     const members = await Alliance.getMembers(req.alliance.allianceId);
     res.status(200).json(members);
   } catch (e) {
+    console.log("e", e);
     res.status(500).json({ message: "An error has occured" });
   }
 });
@@ -61,7 +61,7 @@ router.get("/members", [verifyUser, verifyAlliance], async (req, res) => {
 // applications
 router.get("/applications", verifyUser, async (req, res) => {
   try {
-    const data = await Alliance.getApplications(req.user.userId);
+    const data = await Alliance.getApplications(req.profile.profileId);
     res.status(200).json(data);
   } catch (e) {
     res.status(404).json({ message: "could not find alliance" });
@@ -70,7 +70,7 @@ router.get("/applications", verifyUser, async (req, res) => {
 router.post("/applications/apply/:allianceId", verifyUser, async (req, res) => {
   const uuid = req.params.allianceId;
   try {
-    const data = await Alliance.postApplication(uuid, req.user.userId);
+    const data = await Alliance.postApplication(uuid, req.profile.profileId);
     res.status(200).json(data);
   } catch (e) {
     res.status(404).json({ message: "could not find alliance" });
@@ -82,7 +82,10 @@ router.delete(
   async (req, res) => {
     const uuid = req.params.allianceId;
     try {
-      const data = await Alliance.cancelApplication(uuid, req.user.userId);
+      const data = await Alliance.cancelApplication(
+        uuid,
+        req.profile.profileId
+      );
       res.status(200).json(data);
     } catch (e) {
       res.status(404).json({ message: "could not find alliance" });
@@ -100,7 +103,7 @@ router.post("/", verifyUser, async (req, res) => {
     allianceOwner: userId,
   };
   try {
-    Alliance.createAlliance(post);
+    await Alliance.createAlliance(post);
     const profile = await User.updateUserMember(userId);
 
     res.status(200).json(profile);

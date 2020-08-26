@@ -11,10 +11,10 @@ exports.up = function (knex, Promise) {
     .createTable("userAllianceEvent", (tbl) => {
       tbl.increments("userAllianceEventId");
       tbl
-        .integer("userId", 255)
+        .integer("profileId")
         .unsigned()
-        .references("userId")
-        .inTable("users")
+        .references("profileId")
+        .inTable("profile")
         .onDelete("CASCADE")
         .onUpdate("CASCADE");
       tbl

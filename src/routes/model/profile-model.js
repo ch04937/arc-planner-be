@@ -10,13 +10,9 @@ module.exports = {
 };
 
 function getProfile(userId) {
-  return db("userProfile")
-    .where({ userId })
-    .select("profileId")
-    .then((ids) => {
-      const profileId = ids[0];
-      return db("profile").where(profileId).first();
-    });
+  return db("userProfile as up")
+    .join("profile as p", "up.profileId", "p.profileId")
+    .where({ userId });
 }
 
 function add(body) {

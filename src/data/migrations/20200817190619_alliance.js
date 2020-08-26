@@ -12,10 +12,10 @@ exports.up = function (knex, Promise) {
     .createTable("userAlliance", (tbl) => {
       tbl.increments("userAllianceId");
       tbl
-        .integer("userId", 255)
+        .integer("profileId")
         .unsigned()
-        .references("userId")
-        .inTable("users")
+        .references("profileId")
+        .inTable("profile")
         .onDelete("CASCADE")
         .onUpdate("CASCADE");
       tbl
@@ -33,13 +33,4 @@ exports.up = function (knex, Promise) {
     });
 };
 
-exports.down = function (knex, Promise) {
-  return knex.schema
-    .dropTableIfExists("userAllianceEvent")
-    .dropTableIfExists("userAlliance")
-    .dropTableIfExists("event")
-    .dropTableIfExists("alliance")
-    .dropTableIfExists("userProfile")
-    .dropTableIfExists("profile")
-    .dropTableIfExists("users");
-};
+exports.down = function (knex, Promise) {};

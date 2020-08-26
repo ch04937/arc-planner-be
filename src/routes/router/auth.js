@@ -18,7 +18,7 @@ const tokenList = {};
 
 router.get("/", verifyUser, async (req, res) => {
   try {
-    const data = await Users.getByUserId(req.user.userId);
+    const data = await Users.getByUserId(req.profile.profileId);
     const response = {
       isMember: data.isMember,
       isLead: data.isLead,
