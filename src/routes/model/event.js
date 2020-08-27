@@ -7,7 +7,26 @@ module.exports = {
   updateEvent,
   getAllEvent,
   getEvent,
+  createTeam,
+  getAllTeams,
 };
+
+function getAllTeams(allianceId, eventId) {
+  return db("teams as t")
+    .join("allianceEventTeams as aet", "aet.teamId", "t.teamId")
+    .where({ allianceId, eventId });
+}
+
+function createTeam(allianceId, eventId, body) {
+  return db("teams")
+    .insert(body)
+    .then((ids) => {
+      const teamId = ids[0];
+      return db("allianceEventTeams")
+        .insert({ allianceId, eventId, teamId })
+        .then(() => getAllTeams(allianceId, eventId));
+    });
+}
 
 function getEvent(eventId, allianceId) {
   return db("userAllianceEvent as uae")
@@ -41,11 +60,10 @@ function createEvent(profileId, allianceId, body) {
   return db("event")
     .insert(body)
     .then((ids) => {
-      console.log("ids", ids);
       const eventId = ids[0];
       return db("userAllianceEvent")
         .insert({ profileId, allianceId, eventId })
-        .then();
+        .then(() => getAllEvent(allianceId));
     });
 }
 

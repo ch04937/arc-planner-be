@@ -7,10 +7,10 @@ exports.up = function (knex, Promise) {
     .createTable("eventTeams", (tbl) => {
       tbl.increments("eventTeamId");
       tbl
-        .integer("profileId")
+        .integer("userAllianceEventId")
         .unsigned()
-        .references("profileId")
-        .inTable("profile")
+        .references("userAllianceEventId")
+        .inTable("userAllianceEvent")
         .onDelete("CASCADE")
         .onUpdate("CASCADE");
       tbl
@@ -20,11 +20,28 @@ exports.up = function (knex, Promise) {
         .inTable("teams")
         .onDelete("CASCADE")
         .onUpdate("CASCADE");
+    })
+    .createTable("allianceEventTeams", (tbl) => {
+      tbl.increments("allianceEventTeamsId");
+      tbl
+        .integer("allianceId", 255)
+        .unsigned()
+        .references("allianceId")
+        .inTable("alliance")
+        .onDelete("CASCADE")
+        .onUpdate("CASCADE");
       tbl
         .integer("eventId", 255)
         .unsigned()
         .references("eventId")
         .inTable("event")
+        .onDelete("CASCADE")
+        .onUpdate("CASCADE");
+      tbl
+        .integer("teamId", 255)
+        .unsigned()
+        .references("teamId")
+        .inTable("teams")
         .onDelete("CASCADE")
         .onUpdate("CASCADE");
     });

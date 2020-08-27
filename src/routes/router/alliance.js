@@ -103,10 +103,13 @@ router.post("/", verifyUser, async (req, res) => {
     allianceOwner: userId,
   };
   try {
-    await Alliance.createAlliance(post);
+    const alliance = await Alliance.createAlliance(post);
     const profile = await User.updateUserMember(userId);
-
-    res.status(200).json(profile);
+    const response = {
+      alliance: alliance,
+      profile: profile,
+    };
+    res.status(200).json(response);
   } catch (e) {
     res.status(404).json({ message: "Could not create alliance" });
   }
