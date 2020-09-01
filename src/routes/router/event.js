@@ -6,40 +6,7 @@ const Event = require("../model/event");
 
 const f5Error = "An error occurred loading reload page";
 
-router.get("/current", [verifyUser, verifyAlliance], async (req, res) => {
-  const { allianceId } = req.alliance;
-  const { profileId } = req.profile;
-  try {
-    const response = await Event.getCurrentEvent(profileId, allianceId);
-    if (response.length) {
-      res.status(200).json(response);
-    } else {
-      res.status(404).json({ message: "No current event going on" });
-    }
-  } catch (e) {
-    console.log("e", e);
-    res.status(500).json({ message: f5Error });
-  }
-});
-router.get(
-  "/specific/:eventId",
-  [verifyUser, verifyAlliance],
-  async (req, res) => {
-    const { allianceId } = req.alliance;
-    const { eventId } = req.params;
-    try {
-      const participants = await Event.getEvent(eventId, allianceId);
-      const teams = await Event.getAllTeams(eventId, allianceId);
-      const response = {
-        participants: participants,
-        teams: teams,
-      };
-      res.status(200).json(response);
-    } catch (e) {
-      res.status(500).json({ message: f5Error });
-    }
-  }
-);
+// get all events
 router.get("/all", [verifyUser, verifyAlliance], async (req, res) => {
   const { allianceId } = req.alliance;
   try {
@@ -50,24 +17,69 @@ router.get("/all", [verifyUser, verifyAlliance], async (req, res) => {
       res.status(404).json({ message: "No events going on" });
     }
   } catch (e) {
+    console.log("e all", e);
+    res.status(500).json({ message: f5Error });
+  }
+});
+// get current evetns
+router.get("/current", [verifyUser, verifyAlliance], async (req, res) => {
+  const { allianceId } = req.alliance;
+  try {
+    const current = await Event.getCurrentEvent(allianceId);
+    // console.log("current", current);
+    res.status(200).json(current);
+  } catch (e) {
+    console.log("e", e);
+    res.status(500).json({ message: f5Error });
+  }
+});
+// get a specific event
+router.get(
+  "/specific/:eventId",
+  [verifyUser, verifyAlliance],
+  async (req, res) => {
+    const { allianceId } = req.alliance;
+    const { eventId } = req.params;
+    try {
+      const participants = await Event.getEventParcipants(eventId, allianceId);
+      const teams = await Event.getAllTeams(allianceId, eventId);
+      const response = {
+        participants: participants,
+        teams: teams,
+      };
+      console.log("response", response);
+      res.status(200).json(response);
+    } catch (e) {
+      console.log("e", e);
+      res.status(500).json({ message: f5Error });
+    }
+  }
+);
+// get the list of events that the user is participating in
+router.get("/participating", [verifyUser, verifyAlliance], async (req, res) => {
+  const { allianceId } = req.alliance;
+  const { profileId } = req.profile;
+  try {
+    const data = await Event.getParticipatingEvents(allianceId, profileId);
+    res.status(200).json(data);
+  } catch (e) {
+    console.log("e", e);
     res.status(500).json({ message: f5Error });
   }
 });
 
 // create event for alliance
 router.post("/", [verifyUser, verifyAlliance], async (req, res) => {
+  const { allianceId } = req.alliance;
   try {
-    const event = await Event.createEvent(
-      req.profile.profileId,
-      req.alliance.allianceId,
-      req.body
-    );
+    const event = await Event.createEvent(allianceId, req.body);
     res.status(200).json(event);
   } catch (e) {
     console.log("e", e);
     res.status(200).json({ message: f5Error });
   }
 });
+// create a team
 router.post(
   "/team/:eventId",
   [verifyUser, verifyAlliance],
@@ -83,17 +95,47 @@ router.post(
     }
   }
 );
+
+// updates participants of events
 router.put("/:eventId", [verifyUser, verifyAlliance], async (req, res) => {
   const { isParticipating } = req.body;
-  const { profileId, allianceId } = req.alliance;
+  const { allianceId } = req.alliance;
   const { eventId } = req.params;
+  const { profileId } = req.profile;
+
   try {
-    await Event.updateEvent(profileId, allianceId, isParticipating, eventId);
-    res.status(200).json({ message: "updated successfully" });
+    const exists = await Event.eventExists(
+      isParticipating,
+      allianceId,
+      eventId,
+      profileId
+    );
+    console.log("exists", exists);
+    if (exists.length) {
+      const doesExist = await Event.updateEvent(
+        profileId,
+        allianceId,
+        isParticipating,
+        eventId
+      );
+      console.log("doesExist", doesExist);
+      res.status(200).json(doesExist);
+    } else {
+      const doesNotExist = await Event.postEvent(
+        profileId,
+        allianceId,
+        isParticipating,
+        eventId
+      );
+      console.log("doesNotExist", doesNotExist);
+      res.status(200).json(doesNotExist);
+    }
   } catch (e) {
+    console.log("e", e);
     res.status(200).json({ message: f5Error });
   }
 });
+
 router.delete("/:eventId", [verifyUser, verifyAlliance], async (req, res) => {
   const { eventId } = req.params;
   try {

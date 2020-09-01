@@ -52,5 +52,5 @@ function update(profileId, changes) {
   return db("profile")
     .where({ profileId })
     .update(changes)
-    .then((count) => (count > 0 ? getProfile(profileId) : null));
+    .then(() => getProfile(profileId));
 }

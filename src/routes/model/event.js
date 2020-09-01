@@ -1,4 +1,5 @@
 const db = require("../../data/db-config");
+const { post } = require("../router/event");
 
 module.exports = {
   getCurrentEvent,
@@ -6,45 +7,83 @@ module.exports = {
   deleteEvent,
   updateEvent,
   getAllEvent,
-  getEvent,
-  createTeam,
+  getEventParcipants,
   getAllTeams,
+  getParticipatingEvents,
+  eventExists,
+  postEvent,
 };
+
+function getParticipatingEvents(allianceId, profileId) {
+  return db("allianceEventTeams").where({
+    allianceId,
+    profileId,
+    isParticipating: true,
+  });
+}
 
 function getAllTeams(allianceId, eventId) {
   return db("teams as t")
-    .join("allianceEventTeams as aet", "aet.teamId", "t.teamId")
+    .join("eventTeams as et", "et.teamId", "t.teamId")
     .where({ allianceId, eventId });
 }
 
-function createTeam(allianceId, eventId, body) {
-  return db("teams")
+function createEvent(allianceId, body) {
+  const team = { teamName: "all participants" };
+  return db("event")
     .insert(body)
     .then((ids) => {
-      const teamId = ids[0];
-      return db("allianceEventTeams")
-        .insert({ allianceId, eventId, teamId })
-        .then(() => getAllTeams(allianceId, eventId));
+      const eventId = ids[0];
+      return db("teams")
+        .insert(team)
+        .then((ids) => {
+          const teamId = ids[0];
+          return db("eventTeams")
+            .insert({
+              allianceId,
+              eventId,
+              teamId,
+            })
+            .then(() => getAllEvent(allianceId));
+        });
     });
 }
 
-function getEvent(eventId, allianceId) {
-  return db("userAllianceEvent as uae")
-    .join("userProfile as up", "uae.profileId", "up.profileId")
-    .join("profile as p", "up.profileId", "p.profileId")
+function getEventParcipants(eventId, allianceId) {
+  return db("allianceEventTeams as aet")
+    .join("teams as t", "t.teamId", "aet.teamId")
     .where({ allianceId, eventId, isParticipating: true });
 }
 
 function getAllEvent(allianceId) {
-  return db("userAllianceEvent as uae")
-    .join("event as e", "e.eventId", "uae.eventId")
+  return db("eventTeams as et")
+    .join("event as e", "e.eventId", "et.eventId")
     .where({ allianceId });
 }
 
+function eventExists(isParticipating, allianceId, eventId, profileId) {
+  return db("allianceEventTeams").where({
+    isParticipating,
+    allianceId,
+    eventId,
+    profileId,
+  });
+}
+function postEvent(profileId, allianceId, isParticipating, eventId) {
+  return db("allianceEventTeams")
+    .insert({
+      profileId,
+      allianceId,
+      isParticipating,
+      eventId,
+    })
+    .then(() => getParticipatingEvents(allianceId, profileId));
+}
 function updateEvent(profileId, allianceId, isParticipating, eventId) {
-  return db("userAllianceEvent")
+  return db("allianceEventTeams")
     .where({ allianceId, profileId, eventId })
-    .update({ isParticipating });
+    .del()
+    .then(() => postEvent(profileId, allianceId, isParticipating, eventId));
 }
 
 function deleteEvent(eventId, allianceId) {
@@ -56,19 +95,8 @@ function deleteEvent(eventId, allianceId) {
     });
 }
 
-function createEvent(profileId, allianceId, body) {
-  return db("event")
-    .insert(body)
-    .then((ids) => {
-      const eventId = ids[0];
-      return db("userAllianceEvent")
-        .insert({ profileId, allianceId, eventId })
-        .then(() => getAllEvent(allianceId));
-    });
-}
-
-function getCurrentEvent(profileId, allianceId) {
-  return db("userAllianceEvent as uae")
-    .join("event as e", "e.eventId", "uae.eventId")
-    .where({ profileId, allianceId, isExpired: false });
+function getCurrentEvent(allianceId) {
+  return db("event as e")
+    .join("eventTeams as et", "e.eventId", "et.eventId")
+    .where({ allianceId, isExpired: false });
 }

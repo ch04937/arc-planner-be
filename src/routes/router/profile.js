@@ -54,7 +54,7 @@ router.put("/change", verifyUser, async (req, res) => {
   const profileId = req.profile.profileId;
   try {
     const post = await Profile.update(profileId, changes);
-    res.status(202).json(post);
+    res.status(202).json(post[0]);
   } catch (e) {
     res.status(404).json({ message: `could not find ${e}`, e: e });
   }
@@ -71,7 +71,7 @@ router.put("/ncc", verifyUser, async (req, res) => {
   }
 });
 
-router.put("/img/", verifyUser, async (req, res) => {
+router.put("/img", verifyUser, async (req, res) => {
   const profileId = await Profile.getProfile(req.profile.profileId);
   upload(req, res, (err) => {
     if (err) {
