@@ -47,7 +47,6 @@ router.get(
         participants: participants,
         teams: teams,
       };
-      console.log("response", response);
       res.status(200).json(response);
     } catch (e) {
       console.log("e", e);
@@ -86,11 +85,11 @@ router.post(
   async (req, res) => {
     const { allianceId } = req.alliance;
     const { eventId } = req.params;
-
     try {
       const teams = await Event.createTeam(allianceId, eventId, req.body);
       res.status(200).json(teams);
     } catch (e) {
+      console.log("e", e);
       res.status(200).json({ message: f5Error });
     }
   }
@@ -110,7 +109,6 @@ router.put("/:eventId", [verifyUser, verifyAlliance], async (req, res) => {
       eventId,
       profileId
     );
-    console.log("exists", exists);
     if (exists.length) {
       const doesExist = await Event.updateEvent(
         profileId,
@@ -118,7 +116,6 @@ router.put("/:eventId", [verifyUser, verifyAlliance], async (req, res) => {
         isParticipating,
         eventId
       );
-      console.log("doesExist", doesExist);
       res.status(200).json(doesExist);
     } else {
       const doesNotExist = await Event.postEvent(
@@ -127,7 +124,6 @@ router.put("/:eventId", [verifyUser, verifyAlliance], async (req, res) => {
         isParticipating,
         eventId
       );
-      console.log("doesNotExist", doesNotExist);
       res.status(200).json(doesNotExist);
     }
   } catch (e) {
@@ -136,6 +132,21 @@ router.put("/:eventId", [verifyUser, verifyAlliance], async (req, res) => {
   }
 });
 
+router.put("/ondrop/teams", [verifyUser, verifyAlliance], async (req, res) => {
+  const old = req.body.old;
+  const updates = req.body.newest;
+  const changes = {
+    teamId: updates.teamId,
+    allianceId: updates.allianceId,
+    eventId: updates.eventId,
+    profileId: updates.profileId,
+  };
+  try {
+    await Event.updateTeams(old, changes);
+  } catch (e) {
+    res.status(200).json({ message: f5Error });
+  }
+});
 router.delete("/:eventId", [verifyUser, verifyAlliance], async (req, res) => {
   const { eventId } = req.params;
   try {

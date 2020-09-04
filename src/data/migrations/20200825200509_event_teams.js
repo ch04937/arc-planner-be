@@ -8,6 +8,23 @@ exports.up = function (knex, Promise) {
       tbl.timestamp("endDate");
       tbl.boolean("isExpired").defaultTo(false);
     })
+    .createTable("allianceEvents", (tbl) => {
+      tbl.increments("allianceEventsId");
+      tbl
+        .integer("allianceId")
+        .unsigned()
+        .references("allianceId")
+        .inTable("alliance")
+        .onDelete("CASCADE")
+        .onUpdate("CASCADE");
+      tbl
+        .integer("eventId")
+        .unsigned()
+        .references("eventId")
+        .inTable("event")
+        .onDelete("CASCADE")
+        .onUpdate("CASCADE");
+    })
     .createTable("teams", (tbl) => {
       tbl.increments("teamId");
       tbl.string("teamName").notNullable();
@@ -76,6 +93,7 @@ exports.down = function (knex, Promise) {
     .dropTableIfExists("eventTeams")
     .dropTableIfExists("teams")
     .dropTableIfExists("userAlliance")
+    .dropTableIfExists("allianceEvents")
     .dropTableIfExists("event")
     .dropTableIfExists("alliance")
     .dropTableIfExists("userProfile")

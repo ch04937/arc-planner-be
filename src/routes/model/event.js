@@ -1,5 +1,4 @@
 const db = require("../../data/db-config");
-const { post } = require("../router/event");
 
 module.exports = {
   getCurrentEvent,
@@ -12,7 +11,23 @@ module.exports = {
   getParticipatingEvents,
   eventExists,
   postEvent,
+  createTeam,
+  updateTeams,
 };
+
+function updateTeams(old, changes) {
+  return db("allianceEventTeams").where(old).update(changes);
+}
+function createTeam(allianceId, eventId, post) {
+  return db("teams")
+    .insert(post)
+    .then((ids) => {
+      const teamId = ids[0];
+      return db("eventTeams")
+        .insert({ allianceId, eventId, teamId })
+        .then(() => getAllTeams(allianceId, eventId));
+    });
+}
 
 function getParticipatingEvents(allianceId, profileId) {
   return db("allianceEventTeams").where({
@@ -44,6 +59,9 @@ function createEvent(allianceId, body) {
               eventId,
               teamId,
             })
+            .then(() => {
+              return db("allianceEvents").insert({ allianceId, eventId });
+            })
             .then(() => getAllEvent(allianceId));
         });
     });
@@ -52,12 +70,13 @@ function createEvent(allianceId, body) {
 function getEventParcipants(eventId, allianceId) {
   return db("allianceEventTeams as aet")
     .join("teams as t", "t.teamId", "aet.teamId")
+    .join("profile as p", "p.profileId", "aet.profileId")
     .where({ allianceId, eventId, isParticipating: true });
 }
 
 function getAllEvent(allianceId) {
-  return db("eventTeams as et")
-    .join("event as e", "e.eventId", "et.eventId")
+  return db("allianceEvents as at")
+    .join("event as e", "e.eventId", "at.eventId")
     .where({ allianceId });
 }
 
@@ -70,14 +89,22 @@ function eventExists(isParticipating, allianceId, eventId, profileId) {
   });
 }
 function postEvent(profileId, allianceId, isParticipating, eventId) {
-  return db("allianceEventTeams")
-    .insert({
-      profileId,
-      allianceId,
-      isParticipating,
-      eventId,
-    })
-    .then(() => getParticipatingEvents(allianceId, profileId));
+  return db("eventTeams as et")
+    .join("teams as t", "et.teamId", "t.teamId")
+    .where({ allianceId, eventId, teamName: "all participants" })
+    .select("t.teamId")
+    .then((res) => {
+      const teamId = res[0].teamId;
+      return db("allianceEventTeams")
+        .insert({
+          profileId,
+          allianceId,
+          isParticipating,
+          eventId,
+          teamId,
+        })
+        .then(() => getParticipatingEvents(allianceId, profileId));
+    });
 }
 function updateEvent(profileId, allianceId, isParticipating, eventId) {
   return db("allianceEventTeams")
