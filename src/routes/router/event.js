@@ -17,7 +17,6 @@ router.get("/all", [verifyUser, verifyAlliance], async (req, res) => {
       res.status(404).json({ message: "No events going on" });
     }
   } catch (e) {
-    console.log("e all", e);
     res.status(500).json({ message: f5Error });
   }
 });
@@ -26,7 +25,6 @@ router.get("/current", [verifyUser, verifyAlliance], async (req, res) => {
   const { allianceId } = req.alliance;
   try {
     const current = await Event.getCurrentEvent(allianceId);
-    // console.log("current", current);
     res.status(200).json(current);
   } catch (e) {
     console.log("e", e);
@@ -49,7 +47,6 @@ router.get(
       };
       res.status(200).json(response);
     } catch (e) {
-      console.log("e", e);
       res.status(500).json({ message: f5Error });
     }
   }
@@ -62,7 +59,6 @@ router.get("/participating", [verifyUser, verifyAlliance], async (req, res) => {
     const data = await Event.getParticipatingEvents(allianceId, profileId);
     res.status(200).json(data);
   } catch (e) {
-    console.log("e", e);
     res.status(500).json({ message: f5Error });
   }
 });
@@ -74,7 +70,6 @@ router.post("/", [verifyUser, verifyAlliance], async (req, res) => {
     const event = await Event.createEvent(allianceId, req.body);
     res.status(200).json(event);
   } catch (e) {
-    console.log("e", e);
     res.status(200).json({ message: f5Error });
   }
 });
@@ -89,7 +84,6 @@ router.post(
       const teams = await Event.createTeam(allianceId, eventId, req.body);
       res.status(200).json(teams);
     } catch (e) {
-      console.log("e", e);
       res.status(200).json({ message: f5Error });
     }
   }
@@ -127,7 +121,6 @@ router.put("/:eventId", [verifyUser, verifyAlliance], async (req, res) => {
       res.status(200).json(doesNotExist);
     }
   } catch (e) {
-    console.log("e", e);
     res.status(200).json({ message: f5Error });
   }
 });
@@ -150,8 +143,9 @@ router.put("/ondrop/teams", [verifyUser, verifyAlliance], async (req, res) => {
 router.delete("/:eventId", [verifyUser, verifyAlliance], async (req, res) => {
   const { eventId } = req.params;
   try {
-    await Event.deleteEvent(eventId, req.alliance.allianceId);
-    res.status(200).json({ message: "Event Deleted Succesfully" });
+    const removed = await Event.deleteEvent(eventId, req.alliance.allianceId);
+    console.log("removed", removed);
+    res.status(200).json(removed);
   } catch (e) {
     console.log("e", e);
   }

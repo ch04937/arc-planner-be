@@ -114,16 +114,29 @@ function updateEvent(profileId, allianceId, isParticipating, eventId) {
 }
 
 function deleteEvent(eventId, allianceId) {
-  return db("userAllianceEvent")
-    .where({ eventId, allianceId })
+  return db("event as e")
+    .where({ eventId })
     .del()
     .then(() => {
-      return db("event").where({ eventId }).del();
+      return db("allianceEvents")
+        .where({ eventId, allianceId })
+        .del()
+        .then(() => {
+          return db("eventTeams")
+            .where({ eventId, allianceId })
+            .del()
+            .then(() => {
+              return db("allianceEventTeams")
+                .where({ eventId, allianceId })
+                .del()
+                .then(() => getAllEvent(allianceId));
+            });
+        });
     });
 }
 
 function getCurrentEvent(allianceId) {
   return db("event as e")
-    .join("eventTeams as et", "e.eventId", "et.eventId")
+    .join("allianceEvents as at", "e.eventId", "at.eventId")
     .where({ allianceId, isExpired: false });
 }
