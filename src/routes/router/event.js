@@ -27,7 +27,6 @@ router.get("/current", [verifyUser, verifyAlliance], async (req, res) => {
     const current = await Event.getCurrentEvent(allianceId);
     res.status(200).json(current);
   } catch (e) {
-    console.log("e", e);
     res.status(500).json({ message: f5Error });
   }
 });
@@ -144,7 +143,6 @@ router.delete("/:eventId", [verifyUser, verifyAlliance], async (req, res) => {
   const { eventId } = req.params;
   try {
     const removed = await Event.deleteEvent(eventId, req.alliance.allianceId);
-    console.log("removed", removed);
     res.status(200).json(removed);
   } catch (e) {
     console.log("e", e);

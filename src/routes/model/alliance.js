@@ -11,9 +11,41 @@ module.exports = {
   postApplication,
   getAllianceIdByUuid,
   cancelApplication,
+  updateSettings,
   getPrivilege,
+  deleteAlliance,
+  getMembersToNotify,
 };
 
+function getMembersToNotify(allianceId) {
+  return db("userAlliance").where({ allianceId }).select("profileId");
+}
+
+function deleteAlliance(allianceId) {
+  return db("alliance")
+    .where({ allianceId })
+    .del()
+    .then(() => {
+      return db("userAlliance")
+        .where({ allianceId })
+        .del()
+        .then(() => {
+          return db("allianceEventTeams")
+            .where({ allianceId })
+            .del()
+            .then(() => {
+              return db("eventTeams").where({ allianceId }).del().then();
+            });
+        });
+    });
+}
+
+function updateSettings(changes, allianceId) {
+  return db("alliance")
+    .where({ allianceId })
+    .update(changes)
+    .then(() => getAlliance(allianceId));
+}
 function getPrivilege(allianceId, profileId) {
   return db("userAlliance").where({ allianceId, profileId });
 }

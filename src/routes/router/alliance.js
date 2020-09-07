@@ -115,4 +115,27 @@ router.post("/", verifyUser, async (req, res) => {
   }
 });
 
+router.put("/changes", [verifyUser, verifyAlliance], async (req, res) => {
+  const body = req.body;
+  const { allianceId } = req.alliance;
+  try {
+    const changes = await Alliance.updateSettings(body, allianceId);
+    res.status(200).json(changes);
+  } catch (e) {
+    console.log("e", e);
+    res.status(404).json({ message: "an error has occured" });
+  }
+});
+
+router.delete("/delete", [verifyUser, verifyAlliance], async (req, res) => {
+  const { allianceId } = req.alliance;
+  try {
+    const notifiedMembers = await Alliance.getMembersToNotify(allianceId);
+    const deleted = await Alliance.deleteAlliance(allianceId);
+    console.log("deleted", deleted);
+  } catch (e) {
+    console.log("e", e);
+  }
+});
+
 module.exports = router;
