@@ -15,7 +15,15 @@ module.exports = {
   getPrivilege,
   deleteAlliance,
   getMembersToNotify,
+  userUpdate,
 };
+
+function userUpdate(userId) {
+  return db("users")
+    .where({ userId })
+    .update({ isMember: false })
+    .then(() => getAllianceList());
+}
 
 function getMembersToNotify(allianceId) {
   return db("userAlliance").where({ allianceId }).select("profileId");
@@ -34,7 +42,10 @@ function deleteAlliance(allianceId) {
             .where({ allianceId })
             .del()
             .then(() => {
-              return db("eventTeams").where({ allianceId }).del().then();
+              return db("eventTeams")
+                .where({ allianceId })
+                .del()
+                .then(() => getAllianceList());
             });
         });
     });

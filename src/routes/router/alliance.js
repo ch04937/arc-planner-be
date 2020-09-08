@@ -122,7 +122,6 @@ router.put("/changes", [verifyUser, verifyAlliance], async (req, res) => {
     const changes = await Alliance.updateSettings(body, allianceId);
     res.status(200).json(changes);
   } catch (e) {
-    console.log("e", e);
     res.status(404).json({ message: "an error has occured" });
   }
 });
@@ -130,9 +129,14 @@ router.put("/changes", [verifyUser, verifyAlliance], async (req, res) => {
 router.delete("/delete", [verifyUser, verifyAlliance], async (req, res) => {
   const { allianceId } = req.alliance;
   try {
-    const notifiedMembers = await Alliance.getMembersToNotify(allianceId);
+    // send notifications to members when alliance is disbanded
+    // and change there profile to is member false
+    // await Alliance.changesToUserProfiles()
+    // const notifiedMembers = await Alliance.getMembersToNotify(allianceId);
     const deleted = await Alliance.deleteAlliance(allianceId);
-    console.log("deleted", deleted);
+    await Alliance.userUpdate(req.user.userId);
+
+    res.status(200).json(deleted);
   } catch (e) {
     console.log("e", e);
   }

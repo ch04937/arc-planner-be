@@ -1,11 +1,13 @@
 const Alliance = require("../routes/model/alliance");
 
 async function verifyAlliance(req, res, next) {
-  if (req.user.isMember) {
-    const data = await Alliance.getUserAlliance(req.profile.profileId);
-    req.alliance = data;
+  const alliance = await Alliance.getUserAlliance(req.profile.profileId);
+  if (alliance) {
+    req.alliance = alliance;
     next();
   } else {
+    // verify alliance
+    await Alliance.userUpdate(req.user.userId);
     res.status(404).json({ message: "You need to be a member of an alliance" });
   }
 }
