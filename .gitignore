@@ -2,3 +2,4 @@
 .env
 /x-route-testing
 /public/uploads
+*.db3
