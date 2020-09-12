@@ -3,3 +3,4 @@
 /x-route-testing
 /public/uploads
 *.db3
+package-lock.json
